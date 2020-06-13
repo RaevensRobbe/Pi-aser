@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Pi-aser</title>
+        <meta name="description" content="This is my HTML5 boilerplate.">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="msapplication-TileColor" content="#c51e23">
+        <meta name="theme-color" content="#c51e23">
+
+        <link rel="manifest" href="site.webmanifest">
+        <link rel="mask-icon" href="./img/logo-wit.png" color="#c51e23">
+        <link rel="stylesheet" href="./style/circle.css">
+        <link rel="stylesheet" href="./style/screen.css">
+        <link rel="stylesheet" href="./style/normalize.css">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+        <script src="script/dataHandler.js"></script>
+        <script src="script/app_decibels.js"></script>
+        <script src="script/app.js"></script>
+
+    </head>
+    <body>
+        <header class="o-row-header">
+            <div class="o-container">
+                <div class="c-header">
+                    <div class="c-header__logo">
+                        <h1>
+                            <img class="c-logo" src="img/logo-wit.png" alt="Pi-aser">
+                        </h1>
+                    </div>
+                </div> 
+            </div>          
+        </header>
+        <div class="c-border"></div>
+        <br>
+        <section class="o-row">
+            <div class="o-container">
+                <!--Css om tekst en foto naast elkaar te zetten-->
+                <div class="o-layout o-layout--gutter-xl">
+                    <article class="o-layout__item u-1-of-2-bp2 u-2-of-3-bp3 o-layout o-layout--align-content-space-between">
+                        <h2 class="c-lead c-lead--lgxl">
+                            Play History
+                        </h2>
+                        <!--Historiek komt hier-->
+                        <canvas id='myChart' style="position: relative; height:20vh; width:20vw"></canvas>
+                    </article>
+                    
+                    <article class="o-layout__item u-1-of-2-bp2 u-1-of-3-bp3 o-layout o-layout--align-content-space-between">
+                        <h2 class="c-lead c-lead--lgxl">
+                            Live Decibels
+                        </h2>
+                        <!--DB METER KOMT HIER-->
+                        <div class="o-layout__item">
+                                <div class='js-decibels'>
+
+                                </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section> 
+        
+        <section class="o-row">
+            <div class="o-container">
+                <!--Css om tekst en foto naast elkaar te zetten-->
+                <div class="o-layout o-layout--gutter-lg o-layout--justify-space-between">
+                    <div class="o-layout__item">
+                        <h2 class="c-lead c-lead--lgxl">
+                            Sounds
+                        </h2>
+                    </div>
+                    <div class="o-layout__item u-1-of-3-bp3">
+                        <div class='o-sound'>
+                            <button class="js-sound-btn btn-hover" data-idsound="piano">Piano</button>
+                        </div>
+                    </div>
+                    <div class="o-layout__item u-1-of-3-bp3">
+                        <div class='o-sound'>
+                            <button class="js-sound-btn btn-hover" data-idsound="soundboard">Soundboard</button>
+                        </div>
+                    </div>
+                    <div class="o-layout__item u-1-of-3-bp3">
+                        <div class='o-sound'>
+                            <button class="js-sound-btn btn-hover" data-idsound="guitar">Guitar</button>
+                        </div>
+                    </div>                   
+                </div>
+            </div>
+        </section> 
+    </body>
+</html>
