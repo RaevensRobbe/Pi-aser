@@ -20,13 +20,10 @@ import os
 import pygame
 
 # Code voor led
-from helpers.klasseknop import Button
 from helpers.MCP3008 import MCP3008
 from RPi import GPIO
 
 led1 = 21
-lasers = 25
-knop1 = Button(20)
 
 lcd_RS = 21
 lcd_E = 20
@@ -52,7 +49,6 @@ def initial_connection():
 
 @socketio.on('F2B_select_sound')
 def switch_sound(data):
-    #print(f'Geluid aanpassen naar {data}')
     global selectedmap
     selectedmap = data['selected_sound']
     print(selectedmap)
@@ -76,7 +72,7 @@ def get_live_decibelmeter():
         s = DataRepository.get_live_decibels()
         return jsonify(s), 200
 
-def read_all_ldrs(selectedmap):
+def read_all_ldrs():
     while True:
         # C noot => laser 1
         channelC = mcp.read_channel(0)
@@ -111,7 +107,9 @@ def read_all_ldrs(selectedmap):
         channelB = mcp.read_channel(6)
         if channelB > 500:
             play_note("B",selectedmap)
-        
+
+        #threading.Timer(1, read_all_ldrs(selectedmap)).start()
+
         # print(f"Channel C: {channelC}")
         # print(f"Channel D: {channelD}")
         # print(f"Channel E: {channelE}")
@@ -122,12 +120,12 @@ def read_all_ldrs(selectedmap):
 
 
 def play_note(activatedNote, selectedmap):
-    print(activatedNote)
-    #print(f"/home/robbe/1920-1mct-project1-RaevensRobbe/Code/backend/sounds/{selectedmap}/{activatedNote}.wav")
+    # print(activatedNote)
+    # print(f"/home/robbe/1920-1mct-project1-RaevensRobbe/Code/backend/sounds/{selectedmap}/{activatedNote}.wav")
     sound = pygame.mixer.Sound(f"/home/robbe/1920-1mct-project1-RaevensRobbe/Code/backend/sounds/{selectedmap}/{activatedNote}.wav")
     sound.play()
     # while pygame.mixer.get_busy():
-    #     #print(pygame.mixer.get_busy())
+    #     print(pygame.mixer.get_busy())
     #     pass
 
 def setup():
@@ -138,6 +136,10 @@ def setup():
     pygame.mixer.init()
 
 def databasefunctie():
+    #voor de sounds
+    pygame.init()
+    pygame.mixer.init()
+
     setup()
     #LCD instellen
     lcd = HD44780(lcd_RS, lcd_E, databits)
@@ -149,9 +151,11 @@ def databasefunctie():
     print(ip[1])
     lcd.send_instruction(0x01)
     lcd.write_message(str(ip[1]))
+
     #serial communicatie arduino
     ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
     ser.flush()
+
     #variabelen
     i = 0
     tijd = ""
@@ -161,13 +165,6 @@ def databasefunctie():
         value = ser.readline().decode().rstrip()
         uid_scanned = value[:4]
         print(value)
-        lcd.send_instruction(lcd.secondline())
-        lcd.write_message(str(f"{value} dB             "))
-        print("doorsturen")
-        databasewaarde = DataRepository.get_live_decibels()
-        print("#######")
-        print(f"Laatste waarde: {databasewaarde}")
-        print("#######")
         if uid_scanned == "UID:" and i == 0:
             i = 1
             print("RFID SCANNED")
@@ -181,6 +178,10 @@ def databasefunctie():
             datum = now.strftime("%Y-%m-%d %H:%M:%S")
             play_note("start",'startstop')
             insert = DataRepository.insert_historiek_play(userID, datum)
+            lcd.send_instruction(lcd.secondline())
+            lcd.write_message(str(f"{value}   "))
+            time.sleep(2)
+            #GPIO.output(lasers, GPIO.HIGH)
         elif uid_scanned == "UID:" and i == 1:
             i = 0
             print("2E SCAN OM AF TE SLUITEN")
@@ -192,24 +193,37 @@ def databasefunctie():
             print(playtime)
             update = DataRepository.update_historiek_play(playtime, datum) 
             play_note("stop",'startstop')
+            time.sleep(5)
+            #GPIO.output(lasers, GPIO.LOW)
         elif i == 1:
+            lcd.send_instruction(lcd.secondline())
+            lcd.write_message(str(f"{value} dB             "))
             if value != '-INF':
                 insert_decibel = DataRepository.insert_decibels(value)
-            databasewaarde = DataRepository.get_live_decibels()
+            #databasewaarde = DataRepository.get_live_decibels()
+        elif i == 0 and uid_scanned != "UID:":
+            lcd.send_instruction(lcd.secondline())
+            lcd.write_message(str(f"{value} dB             "))
 
+def startserver():
+    socketio.run(app, debug=False, host='0.0.0.0', port=5000)
 
 threading.Timer(1, databasefunctie).start()
-threading.Timer(1, read_all_ldrs(selectedmap)).start()
+threading.Timer(2, startserver).start()
+threading.Timer(1, read_all_ldrs()).start()
 print("testtttttttttttttttttttt")
 
-if __name__ == '__main__':
-    socketio.run(app, debug=False, host='0.0.0.0', port=5000)
-    # try:
-    #     pass
-    #     # socketio.run(app, debug=False, host='0.0.0.0', port=5000)
 
-    # except KeyboardInterrupt as ex:
-    #     print(ex)
-    #     GPIO.cleanup()
-    # finally:
-    #     GPIO.cleanup() 
+
+
+if __name__ == '__main__':
+    # pass
+    # socketio.run(app, debug=False, host='0.0.0.0', port=5000)
+    try:
+        pass    
+
+    except KeyboardInterrupt as ex:
+        print(ex)
+        GPIO.cleanup()
+    finally:
+        GPIO.cleanup() 
