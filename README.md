@@ -12,8 +12,6 @@ I used an Arduino UNO for my decibel meter and my RFID scanner. I used serial co
 
 I used a python script to get everything to work.
 
-If you dont want a site to run and just the laser piano I recommend you to look at my app.py because there I have a fast scan over the ldr's if your hands are above it or not.
-If you want to use the site i recommend to look at app_backup.py because in my app.py my site didnt work because of 2 threads and I couldn't find a solution in time.
+When you scan you will be able to see your times you played on the history graph on the site. You have to scan twice (first time to start second time to stop) You also be able to see your decibels live on the website if you scan.
 
-Have a lot of fun with this project
-!
+Have a lot of fun with this project!
